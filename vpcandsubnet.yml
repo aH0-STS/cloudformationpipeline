@@ -1,96 +1,106 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: StackSet template to create a basic VPC with public and private subnets
- 
+Description: Dynamic VPC template with parameterized subnet CIDRs
+
 Parameters:
   VPCCidr:
     Type: String
     Default: 10.0.0.0/16
     Description: CIDR block for the VPC
- 
+
+  PublicSubnet1Cidr:
+    Type: String
+    Description: CIDR for Public Subnet 1
+
+  PublicSubnet2Cidr:
+    Type: String
+    Description: CIDR for Public Subnet 2
+
+  PrivateSubnet1Cidr:
+    Type: String
+    Description: CIDR for Private Subnet 1
+
+  PrivateSubnet2Cidr:
+    Type: String
+    Description: CIDR for Private Subnet 2
+
 Resources:
   MyVPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref VPCCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Sub "StackSet-VPC-${AWS::Region}"
- 
+          Value: !Sub "VPC-${AWS::StackName}"
+
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: 10.0.1.0/24
+      CidrBlock: !Ref PublicSubnet1Cidr
       AvailabilityZone: !Select [0, !GetAZs '']
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
           Value: "PublicSubnet1"
- 
+
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: 10.0.2.0/24
+      CidrBlock: !Ref PublicSubnet2Cidr
       AvailabilityZone: !Select [1, !GetAZs '']
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
           Value: "PublicSubnet2"
- 
+
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: 10.0.3.0/24
+      CidrBlock: !Ref PrivateSubnet1Cidr
       AvailabilityZone: !Select [0, !GetAZs '']
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
           Value: "PrivateSubnet1"
- 
+
   PrivateSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: 10.0.4.0/24
+      CidrBlock: !Ref PrivateSubnet2Cidr
       AvailabilityZone: !Select [1, !GetAZs '']
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
           Value: "PrivateSubnet2"
- 
-    # MyEc2Instance:
-    #   Type: AWS::EC2::Instance
-    #   Properties:
-    #     ImageId:  
-    #     InstanceType: t2.micro
-    #     SecurityGroupIds:
-    #       - default
- 
-# Outputs:
-#   VpcId:
-#     Description: The ID of the created VPC
-#     Value: !Ref MyVPC
-#     Export:
-#       Name: !Sub "${AWS::StackName}-VpcId"
- 
-#   PublicSubnet1Id:
-#     Value: !Ref PublicSubnet1
-#     Export:
-#       Name: !Sub "${AWS::StackName}-PublicSubnet1"
- 
-#   PublicSubnet2Id:
-#     Value: !Ref PublicSubnet2
-#     Export:
-#       Name: !Sub "${AWS::StackName}-PublicSubnet2"
- 
-#   PrivateSubnet1Id:
-#     Value: !Ref PrivateSubnet1
-#     Export:
-#       Name: !Sub "${AWS::StackName}-PrivateSubnet1"
- 
-#   PrivateSubnet2Id:
-#     Value: !Ref PrivateSubnet2
-#     Export:
-#       Name: !Sub "${AWS::StackName}-PrivateSubnet2"
+
+Outputs:
+  VpcId:
+    Description: The ID of the created VPC
+    Value: !Ref MyVPC
+    Export:
+      Name: !Sub "${AWS::StackName}-VpcId"
+
+  PublicSubnet1Id:
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet1"
+
+  PublicSubnet2Id:
+    Value: !Ref PublicSubnet2
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet2"
+
+  PrivateSubnet1Id:
+    Value: !Ref PrivateSubnet1
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet1"
+
+  PrivateSubnet2Id:
+    Value: !Ref PrivateSubnet2
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet2"
